@@ -4,3 +4,4 @@ venv/
 __pycache__/
 sitemon.py
 log/
+app_data.db

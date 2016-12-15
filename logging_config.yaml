@@ -20,7 +20,7 @@ loggers:
     propagate: true
     level: DEBUG
     handlers: [console, debugfile]
-  main:
+  main_worker:
     propagate: true
     level: DEBUG
     handlers: [console, debugfile]
