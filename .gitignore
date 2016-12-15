@@ -3,3 +3,4 @@ checksites.log
 venv/
 __pycache__/
 sitemon.py
+log/

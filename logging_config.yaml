@@ -1,0 +1,33 @@
+---
+formatters:
+  brief:
+    format: "%(levelname)s <PID %(process)d:%(processName)s> %(name)s.%(funcName)s() (%(lineno)d): %(message)s"
+filters: []
+handlers:
+  console:
+    class: logging.StreamHandler
+    formatter: brief
+    stream: ext://sys.stdout
+  debugfile:
+    class: logging.handlers.RotatingFileHandler
+    filename: './log/debug.log'
+    formatter: brief
+    maxBytes: 10485760
+    backupCount: 20
+    encoding: utf8
+loggers:
+  status_checker:
+    propagate: true
+    level: DEBUG
+    handlers: [console, debugfile]
+  main:
+    propagate: true
+    level: DEBUG
+    handlers: [console, debugfile]
+  requests:
+     propagate: false
+     level: ERROR
+     handlers: [console, debugfile]
+disable_existing_loggers: false
+incremental: false
+version: 1

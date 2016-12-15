@@ -1,11 +1,13 @@
 import requests
 import time
 import re
+import logging
 
 
 class SiteStatusChecker(object):
 
     def __init__(self, timeout=10):
+        self.logger = logging.getLogger(__name__)
         self.timeout = timeout
 
     def _check_site_status(self, url):
@@ -54,9 +56,10 @@ class SiteStatusChecker(object):
 
             for _ in range(times):
                 if not self.check_internet_status():
-                    print("No Internet Available. Waiting...")
+                    self.logger.debug("No Internet Available. Waiting...")
                     continue
 
+                self.logger.debug("Internet is Available. Checking the urls...")
                 for url in urls:
                     url_up, url_time, url_status_code = self._check_site_status(url)
                     if url_up:
