@@ -3,6 +3,8 @@ import time
 import re
 import logging
 
+from models import Site, Response, db_session
+
 
 class SiteStatusChecker(object):
 
@@ -50,9 +52,9 @@ class SiteStatusChecker(object):
             return True
         return False
 
-    def check_status_repeatedly(self, urls, times=5000, interval_between=5):
+    def check_status_repeatedly(self, times=5000, interval_between=5):
         try:
-            urls = map(self._get_normalized_url, urls)
+            sites = db_session.query(Site).all()
 
             for _ in range(times):
                 if not self.check_internet_status():
@@ -60,14 +62,24 @@ class SiteStatusChecker(object):
                     continue
 
                 self.logger.debug("Internet is Available. Checking the urls...")
-                for url in urls:
+                for site in sites:
+                    url = self._get_normalized_url(site.url)
+                    print("checking %s" % url)
                     url_up, url_time, url_status_code = self._check_site_status(url)
                     if url_up:
-                        print("%s is up. It took %.3f seconds to load. Code: %s" % (url, url_time, url_status_code))
+                        self.logger.debug("%s is up. It took %.3f seconds to load. Code: %s" % (url, url_time, url_status_code))
                     elif url_status_code is not None:
-                        print("%s looks like its down. Time Taken: %.3f. Code: %s" % (url, url_time, url_status_code))
+                        self.logger.debug("%s looks like its down. Time Taken: %.3f. Code: %s" % (url, url_time, url_status_code))
                     else:
-                        print("%s is down." % (url))
+                        self.logger.debug("%s is down." % (url))
+
+                    self.logger.debug("Adding the Response to DB")
+                    try:
+                        resp = Response(site, url_up, code=url_status_code, time_taken=url_time)
+                        db_session.add(resp)
+                        db_session.commit()
+                    except Exception as e:
+                        self.logger.debug("Database Exception Occcured while adding response to the DB: %s", e)
 
                 time.sleep(interval_between * 60)
             return True
