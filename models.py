@@ -24,6 +24,10 @@ class Site(Base):
     def __repr__(self):
         return "<Site :%r>" % self.url
 
+    @property
+    def serialize(self):
+        return {'id': self.id, 'url': self.url}
+
 
 class Response(Base):
     __tablename__ = 'responses'
@@ -43,6 +47,17 @@ class Response(Base):
 
     def __repr__(self):
         return "<Response :%r:%r>" % (self.site.url, self.up)
+
+    @property
+    def serialize(self):
+        return {
+            'id': self.id,
+            'time_stamp': self.time_stamp,
+            'up': self.up,
+            'code': self.code,
+            'time_taken': self.time_taken,
+            'site': self.site.serialize
+        }
 
 
 if __name__ == '__main__':
